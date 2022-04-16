@@ -8,7 +8,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract KhelCoin is ERC20, ERC20Burnable, Pausable, Ownable {
     constructor() ERC20("KHEL Coin", "KHEL") {
-        _mint(msg.sender, 1000000 * 10 ** decimals());
+        _mint(msg.sender, 1000000 * (10 ** decimals()));
     }
 
     function pause() public onlyOwner {

@@ -81,10 +81,8 @@ App = {
 
     // Load account data
     console.log("Loading accounts .."); 
-    console.log(web3.currentProvider) ;
     web3.eth.getCoinbase(function(err, account) {
       if(err === null) {
-        console.log(account);
         App.account = account;
         $('#accountAddress').html("Your Account: " + account);
       }
@@ -95,26 +93,19 @@ App = {
 
     // Load token sale contract
     App.contracts.DappTokenSale.deployed().then(function(instance) {
-      dappTokenSaleInstance = instance;
-      console.log(dappTokenSaleInstance);
+      dappTokenSaleInstance = instance;      
       return dappTokenSaleInstance.rate();
     }).then(function(rate) {            
-      App.tokenPrice = web3.fromWei(rate, 'wei');
-      console.log("rate = ", App.tokenPrice.toNumber());
+      App.tokenPrice = web3.fromWei(rate, 'wei');     
       $('.token-price').html(App.tokenPrice.toNumber());    
       // Load token contract
       App.contracts.DappToken.deployed().then(function(instance) {
         dappTokenInstance = instance;
         return dappTokenInstance.balanceOf(App.account);
-      }).then(function(balance) {
-        console.log(web3.fromWei(balance, 'wei'));
+      }).then(function(balance) {        
         $('.dapp-balance').html(web3.fromWei(balance, 'ether').toNumber());
-        console.log(web3.toWei('1'));
         var numberOfTokens = $('#numberOfTokens').val();
         numberOfTokens = web3.toWei(numberOfTokens);    
-        console.log(numberOfTokens); 
-        console.log("tokenPrice : ", numberOfTokens * App.tokenPrice);
-        console.log(web3.fromWei(numberOfTokens * App.tokenPrice, 'wei'));
         App.loading = false;
         loader.hide();
         content.show();

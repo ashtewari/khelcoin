@@ -6,6 +6,7 @@ App = {
   tokenPrice: 1000000000000000,
   tokensSold: 0,
   tokensAvailable: 750000,
+  web3NotFound: false,
 
   init: function() {
     console.log("App initialized...")
@@ -13,6 +14,8 @@ App = {
   },
 
   initWeb3: function() {
+    web3NotFound = false;
+    
     if(typeof window !== 'undefined' && typeof window.ethereum !== 'undefined'){
       //getting Permission to access. This is for when the user has new MetaMask
       window.ethereum.enable();
@@ -24,10 +27,8 @@ App = {
       // Acccounts always exposed. This is those who have old version of MetaMask
     
     } else {
-      // Specify default instance if no web3 instance provided
-      App.web3Provider = new Web3.providers.HttpProvider('http://localhost:7545');
-      web3 = new Web3(App.web3Provider);
-    
+      web3NotFound = true;
+      return App.render();
     }    
     return App.initContracts();
   },
@@ -75,42 +76,54 @@ App = {
 
     var loader  = $('#loader');
     var content = $('#content');
+    var panelPromptWeb3 = $('#panelPromptWeb3');
 
     loader.show();
     content.hide();
+    panelPromptWeb3.hide();
 
-    // Load account data
-    console.log("Loading accounts .."); 
-    web3.eth.getCoinbase(function(err, account) {
-      if(err === null) {
-        App.account = account;
-        $('#accountAddress').html("Your Account: " + account);
-      }
-      else {
-        console.log(err);
-      }
-    })
+    if(web3NotFound) 
+    {
+      loader.hide();
+      panelPromptWeb3.show();
+    }
+    else
+    {
+      panelPromptWeb3.hide();
 
-    // Load token sale contract
-    App.contracts.DappTokenSale.deployed().then(function(instance) {
-      dappTokenSaleInstance = instance;      
-      return dappTokenSaleInstance.rate();
-    }).then(function(rate) {            
-      App.tokenPrice = web3.fromWei(rate, 'wei');     
-      $('.token-price').html(App.tokenPrice.toNumber());    
-      // Load token contract
-      App.contracts.DappToken.deployed().then(function(instance) {
-        dappTokenInstance = instance;
-        return dappTokenInstance.balanceOf(App.account);
-      }).then(function(balance) {        
-        $('.dapp-balance').html(web3.fromWei(balance, 'ether').toNumber());
-        var numberOfTokens = $('#numberOfTokens').val();
-        numberOfTokens = web3.toWei(numberOfTokens);    
-        App.loading = false;
-        loader.hide();
-        content.show();
-      })
-    });
+        // Load account data
+        console.log("Loading accounts .."); 
+        web3.eth.getCoinbase(function(err, account) {
+          if(err === null) {
+            App.account = account;
+            $('#accountAddress').html("Your Account: " + account);
+          }
+          else {
+            console.log(err);
+          }
+        })
+        
+        // Load token sale contract
+        App.contracts.DappTokenSale.deployed().then(function(instance) {
+          dappTokenSaleInstance = instance;      
+          return dappTokenSaleInstance.rate();
+        }).then(function(rate) {            
+          App.tokenPrice = web3.fromWei(rate, 'wei');     
+          $('.token-price').html(App.tokenPrice.toNumber());    
+          // Load token contract
+          App.contracts.DappToken.deployed().then(function(instance) {
+            dappTokenInstance = instance;
+            return dappTokenInstance.balanceOf(App.account);
+          }).then(function(balance) {        
+            $('.dapp-balance').html(web3.fromWei(balance, 'ether').toNumber());
+            var numberOfTokens = $('#numberOfTokens').val();
+            numberOfTokens = web3.toWei(numberOfTokens);    
+            App.loading = false;
+            loader.hide();
+            content.show();
+          })
+        });
+      }
   },
 
   buyTokens: function() {

@@ -4,20 +4,31 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>KhelCoin ICO Sale</title>
+    <title>KhelCoin</title>
     <!-- Bootstrap -->
+    <link href="css/style.css" rel="stylesheet">
     <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link rel="shortcut icon" href="https://khelcoin.nfshost.com/khelcoin.png" />
   </head>
-  <body>
+  <body>   
     <div class="container" style="width: 650px;">
       <div class="row">
+       
         <div class="col-lg-12">
-            <h1 class="text-center">KhelCoin ICO SALE</h1>
+            <h1 class="text-center"><img src="img/khelcoin.png" alt="" width="32" height="32" class="d-inline-block align-text-top">KhelCoin</h1>
+            <h5 class="text-center">The Game Coin</h5>
             <hr/>
             <br/>
         </div>
         <div id="loader">
           <p class="text-center">Loading...</p>
+        </div>
+        <div id="panelPromptWeb3" class="text-center" style="display: none;">
+          <p>Metamask is needed to view your balance or buy more KHEL Coins</p>
+          <a href="https://metamask.io/download/">Click here to download Metamask ..</a>
+          <a href="https://metamask.io/download/">
+            <img src="img/metamask-fox-wordmark-horizontal.svg">
+          </a>
         </div>
         <div id="content" class="text-center" style="display: none;">
           <p>
@@ -27,10 +38,18 @@
             1 Ether = <span class="token-price"></span> KHEL coins
           </p>          
           <br/>
+          <div id="techstack" class="text-center">
+            <p>        
+              <a href="https://ethereum.org/en/dapps/">
+                Powered By <img src="img/ethereum-logo-landscape-black.png" style="width:100px;height:25px;" />
+              </a>        
+            </p>          
+          </div>
+          <br/>          
           <form onSubmit="App.buyTokens()" role="form">
             <div class="form-group">
               <div class="input-group">
-                <input id="numberOfTokens" class="form-control input-lg" type="number" name="number" value="1" min="1" pattern="[0-9]">
+                <input id="numberOfTokens" class="form-control input-lg text-right" style="padding-right: 140px;" type="number" name="number" value="1" min="1" pattern="[0-9]">
                 </input>                
                 <span class="input-group-btn">
                   <button type="submit" class="btn btn-primary btn-lg">Buy KHEL Coins</button>
@@ -45,6 +64,10 @@
         </div>
       </div>
     </div>
+    <div class="footer">
+      <p class="footer-prominent"><a href= "https://www.tewari.info/">Copyright (2022): Ash Tewari - All Rights Reserved</a></p>
+      <a href="https://www.flaticon.com/free-icons/puzzle" title="puzzle icons">Puzzle icons created by Freepik - Flaticon</a>
+    </div>    
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
     <script src="js/bootstrap.min.js"></script>

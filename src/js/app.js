@@ -15,7 +15,7 @@ App = {
 
   initWeb3: function() {
     web3NotFound = false;
-    
+
     if(typeof window !== 'undefined' && typeof window.ethereum !== 'undefined'){
       //getting Permission to access. This is for when the user has new MetaMask
       window.ethereum.enable();
@@ -122,7 +122,13 @@ App = {
             loader.hide();
             content.show();
           })
-        });
+        }).catch(function(err) {          
+          if(err.message.includes('has not been deployed to detected network'))
+          {
+            console.log(err); 
+            $("#myModal").modal()           
+          }
+      });
       }
   },
 

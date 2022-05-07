@@ -93,6 +93,54 @@ contract('KhelCoin', async accounts => {
     
   });  
 
+  it('token transfers (call) - sufficient allowance - returns true', async function() {
+    
+    var fromAccount = accounts[2];
+    var toAccount = accounts[4];
+    var spenderAccount = accounts[6];
+    
+    var fundReceipt = await token.transfer(fromAccount, 500);
+    var receiptApproval = await token.approve(spenderAccount, 200, {from: fromAccount});
+
+    var result = await token.transferFrom.call(fromAccount, toAccount, 100, {from: spenderAccount});
+    assert.equal(result, true, 'transferfrom should return true upon success');
+    
+  });  
+
+  it('token transfers (execute) - sufficient allowance - returns true', async function() {
+    
+    var fromAccount = accounts[2];
+    var toAccount = accounts[4];
+    var spenderAccount = accounts[6];
+    
+    var fundReceipt = await token.transfer(fromAccount, 500);
+    console.log("fundReceipt: ", fundReceipt);
+
+    var receiptApproval = await token.approve(spenderAccount, 200, {from: fromAccount});
+
+    var result = await token.transferFrom(fromAccount, toAccount, 100, {from: spenderAccount});
+    console.log(result);
+    assert.equal(result, true, 'transferfrom should return true upon success');
+    
+  });  
+
+  it.only('pause token transfers', async function() {
+    
+    var recipient = accounts[4];
+    await token.pause();
+    
+    try {
+      await token.transfer(recipient, 500);    
+      assert.fail('tx should have failed');
+    } catch (error) {
+      assert.include(error.message, "revert Pausable: paused", "tx should be reverted, contract is paused.");
+    }   
+    
+    await token.unpause();
+    var result  = await token.transfer.call(recipient, 500);
+    assert.equal(result, true, 'transfer should go through when unpaused');
+
+  });  
 
 
 });

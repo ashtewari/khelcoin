@@ -118,13 +118,13 @@ contract('KhelCoin', async accounts => {
 
     var receiptApproval = await token.approve(spenderAccount, 200, {from: fromAccount});
 
-    var result = await token.transferFrom(fromAccount, toAccount, 100, {from: spenderAccount});
+    var result = await token.transferFrom.call(fromAccount, toAccount, 100, {from: spenderAccount});
     console.log(result);
     assert.equal(result, true, 'transferfrom should return true upon success');
     
   });  
 
-  it.only('pause token transfers', async function() {
+  it('pause token transfers', async function() {
     
     var recipient = accounts[4];
     await token.pause();

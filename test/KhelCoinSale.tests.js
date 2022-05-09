@@ -59,7 +59,28 @@ contract("KhelCoinSale", async accounts => {
             var weiRaised = await sale.weiRaised(); 
             assert.equal(weiRaised, web3.utils.toWei('1'), "wei raised is correct");                
             assert.equal(balanceAfter - balanceBefore, web3.utils.toWei('1'), "ether received");
-        });             
+        });         
+        
+        it("not owner, should not change rate", async function() {            
+            try {
+                await sale.updateRate(12000, {from: accounts[5]});
+                assert.fail("rate change attempted by non-owner, expected revert")    
+            } catch (error) {
+                assert.include(error.message, "revert Ownable: caller is not the owner")
+            }
+        });
+
+        it("only owner, should change rate", async function() {
+            var receipt = await sale.updateRate(12000, {from: accounts[0]});
+            var newRate = await sale.rate();
+            assert.equal(newRate, 12000, 'rate has been updated');
+            
+            assert.equal(receipt.logs.length, 1, 'must emit 1 event');
+            assert.equal(receipt.logs[0].event, 'RateChanged', 'must be a RateChanged event');
+            assert.equal(receipt.logs[0].args.newRate.toString(), '12000', 'new rate should be logged in the event');    
+            assert.equal(receipt.logs[0].args.changedBy, accounts[0], 'rate changed by address should be logged in the event');    
+
+        });        
     });
 
 }); 

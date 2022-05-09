@@ -34,7 +34,7 @@ abstract contract Crowdsale is Context, ReentrancyGuard {
     // The rate is the conversion between wei and the smallest and indivisible token unit.
     // So, if you are using a rate of 1 with a ERC20Detailed token with 3 decimals called TOK
     // 1 wei will give you 1 unit, or 0.001 TOK.
-    uint256 private _rate;
+    uint256 internal _rate;
 
     // Amount of wei raised
     uint256 private _weiRaised;

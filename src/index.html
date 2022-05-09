@@ -20,14 +20,43 @@
             <hr/>
             <br/>
         </div>
-        <div id="loader">
-          <p class="text-center">Loading...</p>
+        <div id="loader" class="text-center">          
+          <p>
+            KhelCoin (KHEL)
+          </p>         
+          <br/>            
+          <form onSubmit="App.connectWallet()" role="form">
+            <div class="form-group">
+              <div class="input-group">               
+                <span class="input-group-btn">
+                  <button type="submit" class="btn btn-primary btn-lg">Connect Wallet</button>
+                </span>
+              </div>
+            </div>
+          </form>                 
+          <p class="text-center">KHEL Coin is available only on Rinkeby Test Network</p>          
+          <div id="techstack" class="text-center">
+            <p>        
+              <a href="https://ethereum.org/en/dapps/">
+                Powered By <img src="img/ethereum-logo-landscape-black.png" style="width:100px;height:25px;" />
+              </a>        
+            </p>          
+          </div>            
+          <div id="" class="text-center" style="display: none;">
+            <p>Metamask is needed to view your balance or buy KHEL Coins</p>
+            <a href="https://metamask.io/download/">Click here to download Metamask ..</a>
+          </br>
+            <a href="https://metamask.io/download/">
+              <img src="img/metamask-fox-wordmark-horizontal.svg" width="200px">
+            </a>
+          </div>                          
         </div>
         <div id="panelPromptWeb3" class="text-center" style="display: none;">
-          <p>Metamask is needed to view your balance or buy more KHEL Coins</p>
+          <p>Metamask is needed to view your balance or buy KHEL Coins</p>
           <a href="https://metamask.io/download/">Click here to download Metamask ..</a>
+        </br>
           <a href="https://metamask.io/download/">
-            <img src="img/metamask-fox-wordmark-horizontal.svg">
+            <img src="img/metamask-fox-wordmark-horizontal.svg" width="200px">
           </a>
         </div>
         <div id="content" class="text-center" style="display: none;">
@@ -61,6 +90,8 @@
           <p>You currently have <span class="dapp-balance"></span>&nbsp;KHEL coins.</p>
           <hr>
           <p id="accountAddress"></p>
+          <p id="selectedNetwork"></p>
+          <p id="contractDeployed"></p>
         </div>
       </div>
     </div>
@@ -74,7 +105,7 @@
             </button>
           </div>
           <div class="modal-body">
-            <p>KhelCoin is not available on the selected network. Connect Metamask to Rinkeyby test network.</p>
+            <p>KhelCoin is not available on the selected network. Connect Metamask to Rinkeby test network.</p>
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-dismiss="modal">OK</button>

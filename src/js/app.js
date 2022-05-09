@@ -7,6 +7,7 @@ App = {
   tokensSold: 0,
   tokensAvailable: 750000,
   web3NotFound: false,
+  selectedNetworkId: 0,
 
   init: function() {
     console.log("App initialized...")
@@ -21,6 +22,21 @@ App = {
       window.ethereum.enable();
       App.web3Provider = window.ethereum;
       web3 = new Web3(window.ethereum);
+      App.selectedNetworkId = window.ethereum.networkVersion;
+      console.log("selectedNetworkId = ", App.selectedNetworkId);
+
+      // detect Metamask account change
+      window.ethereum.on('accountsChanged', function (accounts) {
+        console.log('accountsChanges',accounts);
+        return App.initContracts();
+      });
+
+      // detect Network account change
+      window.ethereum.on('networkChanged', function(networkId){
+        console.log('networkChanged > ',networkId);
+        App.selectedNetworkId = networkId; 
+        return App.initContracts();   
+      });      
     
     }else if (typeof window !== 'undefined' && typeof window.web3 !== 'undefined') {
       web3 = new Web3(window.web3.currentProvider);
@@ -30,6 +46,7 @@ App = {
       web3NotFound = true;
       return App.render();
     }    
+    
     return App.initContracts();
   },
 
@@ -39,6 +56,8 @@ App = {
       App.contracts.DappTokenSale.setProvider(App.web3Provider);
       App.contracts.DappTokenSale.deployed().then(function(dappTokenSale) {
         console.log("KhelCoin Sale Address:", dappTokenSale.address);
+      }).catch(function(err) {
+        console.log(err);
       });
     }).done(function() {
       $.getJSON("KhelCoin.json", function(dappToken) {
@@ -59,7 +78,7 @@ App = {
   listenForEvents: function() {
     App.contracts.DappTokenSale.deployed().then(function(instance) {
       instance.TokensPurchased({}, {
-        fromBlock: 0,
+        fromBlock: 'latest',
         toBlock: 'latest',
       }).watch(function(error, event) {
         console.log("event triggered", event);
@@ -70,8 +89,10 @@ App = {
 
   render: function() {
     if (App.loading) {
+      console.log("App.loading = ", App.loading);
       return;
     }
+    console.log("App.loading = ", App.loading);
     App.loading = true;
 
     var loader  = $('#loader');
@@ -82,6 +103,10 @@ App = {
     content.hide();
     panelPromptWeb3.hide();
 
+    console.log("selectedNetworkId = ", App.selectedNetworkId);
+    $('#selectedNetwork').html("Network: " + App.selectedNetworkId);    
+    $('#contractDeployed').html("");  
+    
     if(web3NotFound) 
     {
       loader.hide();
@@ -100,6 +125,9 @@ App = {
           }
           else {
             console.log(err);
+            loader.show();
+            content.hide();
+            panelPromptWeb3.hide();            
           }
         })
         
@@ -119,14 +147,19 @@ App = {
             var numberOfTokens = $('#numberOfTokens').val();
             numberOfTokens = web3.toWei(numberOfTokens);    
             App.loading = false;
+            console.log("App.loading = ", App.loading);
             loader.hide();
             content.show();
           })
         }).catch(function(err) {          
           if(err.message.includes('has not been deployed to detected network'))
           {
+            App.loading = false;
             console.log(err); 
-            $("#myModal").modal()           
+            loader.show();
+            content.hide();
+            panelPromptWeb3.hide();
+            // $("#myModal").modal()           
           }
       });
       }
@@ -148,6 +181,10 @@ App = {
       $('form').trigger('reset') // reset number of tokens in form
       // Wait for Sell event
     });
+  },
+
+  connectWallet: function() {
+    return App.initWeb3();
   }
 }
 

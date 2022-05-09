@@ -79,7 +79,22 @@ contract("KhelCoinSale", async accounts => {
             assert.equal(receipt.logs[0].event, 'RateChanged', 'must be a RateChanged event');
             assert.equal(receipt.logs[0].args.newRate.toString(), '12000', 'new rate should be logged in the event');    
             assert.equal(receipt.logs[0].args.changedBy, accounts[0], 'rate changed by address should be logged in the event');    
+        });  
+        
+        it("paused, should not allow sale", async function() {                        
+            await sale.pause();
 
+            try {                
+                await sale.buyTokens(accounts[1], {from: accounts[2], value: web3.utils.toWei('1')});              
+                assert.fail('tx should have failed');
+            } catch (error) {
+                assert.include(error.message, "revert Pausable: paused", "tx should be reverted, contract is paused.");
+            }
+
+            await sale.unpause();
+            var receipt  = await sale.buyTokens(accounts[1], {from: accounts[2], value: web3.utils.toWei('1')});              
+            assert.equal(receipt.logs.length, 1, 'must emit 1 event');
+            assert.equal(receipt.logs[0].event, 'TokensPurchased', 'must be a TokensPurchased event');
         });        
     });
 

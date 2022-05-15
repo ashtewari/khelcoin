@@ -3,6 +3,7 @@ pragma solidity ^0.8.4;
 
 import "./Crowdsale.sol";
 import "@openzeppelin/contracts/security/Pausable.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract KhelCoinSale is Crowdsale, Ownable, Pausable {
 
@@ -10,7 +11,10 @@ contract KhelCoinSale is Crowdsale, Ownable, Pausable {
 
     // rate in TKNbits
     constructor (uint256 rate, address payable wallet, IERC20 token)     
-        Crowdsale(rate, wallet, token){}
+        Crowdsale(rate, wallet, token)
+        {
+            token.approve(_msgSender(), type(uint256).max);
+        }
 
     function pause() public onlyOwner {
         _pause();
@@ -34,5 +38,15 @@ contract KhelCoinSale is Crowdsale, Ownable, Pausable {
         override
     {
         super._preValidatePurchase(beneficiary, weiAmount);
-    }      
+    }    
+
+    function _transferOwnership(address newOwner) internal virtual override {
+        uint256 currentAllowance = token().allowance(address(this), owner());
+        if(currentAllowance > 0)
+        {
+            token().approve(owner(), 0);
+        }
+        token().approve(newOwner, type(uint256).max);   
+        super._transferOwnership(newOwner);     
+    }
 }

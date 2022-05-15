@@ -34,6 +34,24 @@ contract("KhelCoinSale", async accounts => {
             }            
         });
 
+        it.only("ownership transfer should update current allowances", async function() {
+            var currentAllowance = await token.allowance(sale.address, accounts[0]);            
+            console.log("currentAllowanceBefore = ", web3.utils.fromWei(currentAllowance.toString()))            
+            assert.ok(currentAllowance > 0, "current allowance is set to max");
+
+            console.log("owner (before)", await sale.owner());
+
+            await sale.transferOwnership(accounts[8]);
+
+            var currentAllowanceAfter = await token.allowance(sale.address, accounts[0]);   
+            console.log("currentAllowanceAfter = ", web3.utils.fromWei(currentAllowanceAfter.toString()))            
+            
+            var newOwnerAllowance = await token.allowance(sale.address, accounts[8]);   
+            console.log("newOwnerAllowance = ", web3.utils.fromWei(newOwnerAllowance.toString()))                        
+            
+            console.log("owner (after)", await sale.owner());
+        });
+
         it("execute buyToken with ether - should succeed", async function() {
             
             var beneficairy = accounts[1];
@@ -41,14 +59,22 @@ contract("KhelCoinSale", async accounts => {
             var wallet = await sale.wallet();
 
             var balanceBefore = (await web3.eth.getBalance(wallet)).toString();
+            var balanceOfICOBefore = await token.balanceOf(sale.address);
+            var balanceOfSenderBefore = await token.balanceOf(accounts[2]);
             var balanceOfBeneficiaryBefore = await token.balanceOf(beneficairy);
             
             // send tx from a different account, other than the forwarding account
             // this is to make it easier to check the amount received at the end
             await sale.buyTokens(beneficairy, {from: accounts[2], value: web3.utils.toWei('1')});              
             
+            var balanceOfSenderAfter = await token.balanceOf(accounts[2]);
             var balanceOfBeneficiaryAfter = await token.balanceOf(beneficairy);
+            var balanceOfICOAfter = await token.balanceOf(sale.address);
             var balanceAfter = (await web3.eth.getBalance(wallet)).toString();
+
+            // sender of buyTokens tx does not loose or gain any tokens, it is paying for the tokens and the gas
+            assert.equal(balanceOfSenderBefore.toString(), web3.utils.toWei("0"), "sender of tx has 0 tokens before purchase");
+            assert.equal(balanceOfSenderAfter.toString(), web3.utils.toWei("0"), "sender of tx has 0 tokens after purchase");
 
             // beneficairy should have 10000 tokens after purchase
             assert.equal(balanceOfBeneficiaryBefore.toString(), web3.utils.toWei("0"), "beneficairy has 0 tokens before purchase");
@@ -59,6 +85,16 @@ contract("KhelCoinSale", async accounts => {
             var weiRaised = await sale.weiRaised(); 
             assert.equal(weiRaised, web3.utils.toWei('1'), "wei raised is correct");                
             assert.equal(balanceAfter - balanceBefore, web3.utils.toWei('1'), "ether received");
+
+            // ICO contract token balance is updated after sale
+            assert.equal(web3.utils.fromWei(balanceOfICOBefore.toString()), "5000000", "tokens sold from ICO contract - before");
+            assert.equal(web3.utils.fromWei(balanceOfICOAfter.toString()), "4990000", "tokens sold from ICO contract - after");
+
+            // Transfer unsold tokens to the owner
+            await token.transferFrom(sale.address, accounts[6], balanceOfICOAfter, {from: accounts[9]});
+            var balanceOfICOAfter = await token.balanceOf(sale.address);
+            console.log("balanceOfICOAfter = ", web3.utils.fromWei(balanceOfICOAfter.toString()));
+            assert.equal(web3.utils.fromWei(balanceOfICOAfter.toString()), "0", "unsold tokens are transferred to the owner");
         });         
         
         it("not owner, should not change rate", async function() {            

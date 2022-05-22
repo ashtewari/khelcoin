@@ -27,7 +27,11 @@ contract("KhelCoinSale", async accounts => {
 
         it("execute buyToken without sending ether - should throw exception", async function() {
             try {
-                await sale.buyTokens(accounts[1]);   
+                return sale.sendTransaction({
+                    from: accounts[1],
+                    value: 100000,
+                    gas: 500000 // Gas limit
+                  });                
                 assert.fail("expected to throw exception if trying to buy without sending ether") ;
             } catch (error) {
                 assert.include(error.message, "revert Crowdsale: weiAmount is 0")
@@ -36,41 +40,37 @@ contract("KhelCoinSale", async accounts => {
 
         it("execute buyToken with ether - should succeed", async function() {
             
-            var beneficairy = accounts[1];
+            var beneficairy = accounts[7];
             var conversionRate = await sale.rate();
             var wallet = await sale.wallet();
 
             var balanceBefore = (await web3.eth.getBalance(wallet)).toString();
             var balanceOfICOBefore = await token.balanceOf(sale.address);
-            var balanceOfSenderBefore = await token.balanceOf(accounts[2]);
             var balanceOfBeneficiaryBefore = await token.balanceOf(beneficairy);
+            var weiRaisedBefore = await sale.weiRaised();
+
+            assert.equal(balanceOfBeneficiaryBefore.toString(), web3.utils.toWei("0"), "beneficairy has 0 tokens before purchase");
+             
+            await sale.sendTransaction({
+                from: beneficairy,
+                value: web3.utils.toWei('1')
+              });            
             
-            // send tx from a different account, other than the forwarding account
-            // this is to make it easier to check the amount received at the end
-            await sale.buyTokens(beneficairy, {from: accounts[2], value: web3.utils.toWei('1')});              
-            
-            var balanceOfSenderAfter = await token.balanceOf(accounts[2]);
             var balanceOfBeneficiaryAfter = await token.balanceOf(beneficairy);
             var balanceOfICOAfter = await token.balanceOf(sale.address);
             var balanceAfter = (await web3.eth.getBalance(wallet)).toString();
 
-            // sender of buyTokens tx does not loose or gain any tokens, it is paying for the tokens and the gas
-            assert.equal(balanceOfSenderBefore.toString(), web3.utils.toWei("0"), "sender of tx has 0 tokens before purchase");
-            assert.equal(balanceOfSenderAfter.toString(), web3.utils.toWei("0"), "sender of tx has 0 tokens after purchase");
-
             // beneficairy should have 10000 tokens after purchase
-            assert.equal(balanceOfBeneficiaryBefore.toString(), web3.utils.toWei("0"), "beneficairy has 0 tokens before purchase");
             assert.equal(balanceOfBeneficiaryAfter.toString(), web3.utils.toWei(conversionRate.toString()), "beneficairy has correct number of tokens based on conversion rate");
             assert.equal(balanceOfBeneficiaryAfter.toString(), web3.utils.toWei("10000"), "beneficairy has 10000 tokens");
 
             // forwarding address should have received ether
             var weiRaised = await sale.weiRaised(); 
-            assert.equal(weiRaised, web3.utils.toWei('1'), "wei raised is correct");                
+            assert.equal(weiRaised - weiRaisedBefore, web3.utils.toWei('1'), "wei raised is correct");                
             assert.equal(balanceAfter - balanceBefore, web3.utils.toWei('1'), "ether received");
 
-            // ICO contract token balance is updated after sale
-            assert.equal(web3.utils.fromWei(balanceOfICOBefore.toString()), "5000000", "tokens sold from ICO contract - before");
-            assert.equal(web3.utils.fromWei(balanceOfICOAfter.toString()), "4990000", "tokens sold from ICO contract - after");
+            // ICO contract token balance is updated after sale  
+            assert.equal(web3.utils.fromWei((balanceOfICOBefore.sub(balanceOfICOAfter)).toString()), "10000", "tokens sold from ICO contract - after");          
 
             // Transfer unsold tokens to the owner
             await token.transferFrom(sale.address, accounts[6], balanceOfICOAfter, {from: accounts[0]});
@@ -103,7 +103,10 @@ contract("KhelCoinSale", async accounts => {
             await sale.pause();
 
             try {                
-                await sale.buyTokens(accounts[1], {from: accounts[2], value: web3.utils.toWei('1')});              
+                await sale.sendTransaction({
+                    from: accounts[2],
+                    value: web3.utils.toWei('1')
+                  });                             
                 assert.fail('tx should have failed');
             } catch (error) {
                 assert.include(error.message, "revert Pausable: paused", "tx should be reverted, contract is paused.");
@@ -111,7 +114,10 @@ contract("KhelCoinSale", async accounts => {
 
             await sale.unpause();
             await token.mint(sale.address, web3.utils.toWei('15000')); // top-up ico sale contract for the test
-            var receipt  = await sale.buyTokens(accounts[1], {from: accounts[2], value: web3.utils.toWei('1')});              
+            var receipt = await sale.sendTransaction({
+                from: accounts[2],
+                value: web3.utils.toWei('1')
+              });                         
             assert.equal(receipt.logs.length, 1, 'must emit 1 event');
             assert.equal(receipt.logs[0].event, 'TokensPurchased', 'must be a TokensPurchased event');
         }); 

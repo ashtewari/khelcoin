@@ -1,5 +1,5 @@
-// SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.8.4;
+// SPDX-License-Identifier: MIT
+pragma solidity 0.8.13;
 
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/utils/Context.sol";
@@ -111,7 +111,7 @@ abstract contract Crowdsale is Context, ReentrancyGuard {
      * @param beneficiary Recipient of the token purchase
      * @param weiAmount Ether received for token purchase
      */
-    function buyTokens(address beneficiary, uint256 weiAmount) internal nonReentrant virtual {
+    function buyTokens(address beneficiary, uint256 weiAmount) internal nonReentrant {
         
         _preValidatePurchase(beneficiary, weiAmount);
 

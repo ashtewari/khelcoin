@@ -1,5 +1,5 @@
-// SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.8.4;
+// SPDX-License-Identifier: MIT
+pragma solidity 0.8.13;
 
 import "./Crowdsale.sol";
 import "@openzeppelin/contracts/security/Pausable.sol";
@@ -49,4 +49,11 @@ contract KhelCoinSale is Crowdsale, Ownable, Pausable {
         token().approve(newOwner, type(uint256).max);   
         super._transferOwnership(newOwner);     
     }
+
+    /**
+     * @param beneficiary Recipient of the token purchase
+     */
+    function buyTokens(address beneficiary) payable public {
+        buyTokens(beneficiary, msg.value);
+    }    
 }

@@ -3,10 +3,10 @@ const KhelCoinSale = artifacts.require("./KhelCoinSale");
 
 module.exports = async function (deployer) {
     let addr = await web3.eth.getAccounts();
-    await deployer.deploy(KhelCoin, {overwrite: false});
+    await deployer.deploy(KhelCoin, {overwrite: true});
     await deployer.deploy(KhelCoinSale, 10000, addr[0], KhelCoin.address);      
     
     let khel = await KhelCoin.deployed();
 
-    khel.transfer(KhelCoinSale.address, web3.utils.toWei('5000000'));
+    khel.transfer(KhelCoinSale.address, web3.utils.toWei('50000000'));
 };

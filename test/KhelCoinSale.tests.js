@@ -138,6 +138,16 @@ contract("KhelCoinSale", async accounts => {
             console.log("newOwnerAllowance = ", web3.utils.fromWei(newOwnerAllowance.toString()))                        
             
             console.log("owner (after)", await sale.owner());
+        });  
+        
+        it("execute buyTokens function - should succeed", async function() {
+            var beneficairy = accounts[9];            
+            var balanceOfBeneficiaryBefore = await token.balanceOf(beneficairy);
+
+            await sale.buyTokens(beneficairy, {from: accounts[3], value: web3.utils.toWei('0.001')});                   
+            
+            var balanceOfBeneficiaryAfter = await token.balanceOf(beneficairy);
+            assert.equal(web3.utils.fromWei((balanceOfBeneficiaryAfter.sub(balanceOfBeneficiaryBefore)).toString()), "12", "tokens sold from ICO contract - after");          
         });        
     });
 

@@ -170,8 +170,8 @@ App = {
     $('#loader').show();
     var numberOfTokens = $('#numberOfTokens').val();
     numberOfTokens = web3.toWei(numberOfTokens);
-    App.contracts.DappTokenSale.deployed().then(function(instance) {
-      return instance.buyTokens(App.account, {
+    App.contracts.DappTokenSale.deployed().then(function(instance) {      
+      return instance.sendTransaction({
         from: App.account,
         value: numberOfTokens / App.tokenPrice,
         gas: 500000 // Gas limit

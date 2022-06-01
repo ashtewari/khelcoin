@@ -20,8 +20,8 @@ contract('KhelCoin', async accounts => {
   it('initial coin supply is correct upon deployment', async function() {
     const totalSupply = await token.totalSupply();
     const adminBalance = await token.balanceOf(accounts[0]);
-    assert.equal(totalSupply.toString(), web3.utils.toWei('10000000'), 'total supply is set to 10M coins');
-    assert.equal(adminBalance.toString(), web3.utils.toWei('5000000'), 'admin balance is set to 10M coins');
+    assert.equal(totalSupply.toString(), web3.utils.toWei('100000000'), 'total supply is set to 100M coins');
+    assert.equal(adminBalance.toString(), web3.utils.toWei('50000000'), 'admin balance is set to 50M coins');
   });
  
   it('transfers token ownership', async function() {

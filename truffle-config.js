@@ -17,11 +17,11 @@
  * phrase from a file you've .gitignored so it doesn't accidentally become public.
  *
  */
-
  require('dotenv').config();
  const kovanMnemonic = process.env["KOVAN_MNEMONIC"];
  const infuraKey = process.env["INFURA_PROJECT_ID"];
  const mnemonic = process.env["MNEMONIC"];
+ const MAINNET_mnemonic = process.env["MAINNET_MNEMONIC"];
 
  const HDWalletProvider = require('@truffle/hdwallet-provider');
 
@@ -47,6 +47,8 @@ module.exports = {
      host: "127.0.0.1",     // Localhost (default: none)
      port: 8545,            // Standard Ethereum port (default: none)
      network_id: "*",       // Any network (default: none)
+     gas: 5500000,
+     gasPrice: 30000000000,
     //  from: "0x7e4ef9433B79dCB2Ff3a39bEF28b18fe9946E3A2
     },
     // Another network with more advanced options...
@@ -82,6 +84,15 @@ module.exports = {
         return new HDWalletProvider(kovanMnemonic, "https://optimism-kovan.infura.io/v3/"+ infuraKey, 3, 1);
       }
     },
+    mainnet: {
+      provider: () => new HDWalletProvider(MAINNET_mnemonic, 'https://mainnet.infura.io/v3/' + infuraKey),
+      network_id: 1,       // Mainnet's id
+      gas: 29900000,
+      gasPrice: 7000000000,        
+      confirmations: 2,    // # of confs to wait between deployments. (default: 0)
+      timeoutBlocks: 200,  // # of blocks before a deployment times out  (minimum/default: 50)
+      skipDryRun: false     // Skip dry run before migrations? (default: false for public nets )
+      },    
     // Useful for private networks
     // private: {
     // provider: () => new HDWalletProvider(mnemonic, `https://network.io`),
@@ -98,7 +109,7 @@ module.exports = {
   // Configure your compilers
   compilers: {
     solc: {
-      version: "0.8.13",      // Fetch exact version from solc-bin (default: truffle's version)
+      version: "0.8.15",      // Fetch exact version from solc-bin (default: truffle's version)
       // docker: true,        // Use "0.5.1" you've installed locally with docker (default: false)
       settings: {          // See the solidity docs for advice about optimization and evmVersion
        optimizer: {

@@ -21,9 +21,9 @@
             <br/>
         </div>
         <div id="loader" class="text-center">          
-          <p>
+          <div class="h3">
             KhelCoin (KHEL)
-          </p>         
+          </div>         
           <br/>            
           <form onSubmit="App.connectWallet()" role="form">
             <div class="form-group">
@@ -52,9 +52,9 @@
           </div>                          
         </div>
         <div id="panelPromptWeb3" class="text-center" style="display: none;">
-          <p>
+          <div class="h3">
             KhelCoin (KHEL)
-          </p>         
+          </div>         
           <br/> 
           <div id="techstack3" class="text-center">
             <p>        
@@ -72,20 +72,18 @@
           </a>          
         </div>
         <div id="content" class="text-center" style="display: none;">
-          <p>
+          <div class="h3">
             KhelCoin (KHEL)
-          </p>
-          <p>
-            1 Ether = <span class="token-price"></span> KHEL coins
-          </p>          
-          <br/>
-          <div id="techstack1" class="text-center">
-            <p>        
-              <a href="https://ethereum.org/en/dapps/">
-                Powered By <img src="img/ethereum-logo-landscape-black.png" style="width:100px;height:25px;" />
-              </a>        
-            </p>          
           </div>
+          <p>
+            <div class="h4">
+              1 Ether = <span class="token-price"></span> KHEL coins*
+            </div>
+            <div class="small">
+              *Price and Exchange Rate subject to change
+            </div>
+          </p>
+          </p>          
           <br/>          
           <form onSubmit="App.buyTokens()" role="form">
             <div class="form-group">
@@ -104,6 +102,14 @@
           <p id="accountAddress"></p>
           <p id="selectedNetwork"></p>
           <p id="contractDeployed"></p>
+          <br/>
+          <div id="techstack1" class="text-center">
+            <p>        
+              <a href="https://ethereum.org/en/dapps/">
+                Powered By <img src="img/ethereum-logo-landscape-black.png" style="width:100px;height:25px;" />
+              </a>        
+            </p>          
+          </div>
         </div>
       </div>
     </div>
